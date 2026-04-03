@@ -7,6 +7,8 @@ import { CenterPile } from "@/components/game/CenterPile";
 import { BluffButton } from "@/components/game/BluffButton";
 import { PlayerHand } from "@/components/game/PlayerHand";
 import { VictoryModal } from "@/components/game/VictoryModal";
+import { AllCardsModal } from "@/components/game/AllCardsModal";
+import { useState } from "react";
 
 const GameRoom = () => {
   const { roomCode } = useParams();
@@ -15,6 +17,7 @@ const GameRoom = () => {
     gameState, currentPlayerId, isMyTurn, isBluffWindow,
     myPlayer, playCards, callBluff, resetGame, loading
   } = useGame();
+  const [showAllCards, setShowAllCards] = useState(false);
 
   const game = useGame() as any;
   useEffect(() => {
@@ -79,7 +82,12 @@ const GameRoom = () => {
       <div className="shrink-0 border-t border-border bg-card/80 backdrop-blur-md pb-safe">
         <div className="flex items-center justify-between px-4 py-1.5">
           <span className="text-[11px] sm:text-xs text-muted-foreground font-medium">Your Hand</span>
-          <span className="text-[11px] sm:text-xs font-mono text-primary font-bold">{myPlayer?.hand.length ?? 0} cards</span>
+          <button 
+            onClick={() => setShowAllCards(true)}
+            className="text-[11px] sm:text-xs font-mono text-primary font-bold hover:underline active:scale-95 transition-transform"
+          >
+            {myPlayer?.hand.length ?? 0} cards (View All)
+          </button>
         </div>
         {myPlayer && (
           <PlayerHand
@@ -96,6 +104,15 @@ const GameRoom = () => {
           winnerName={winner.nickname}
           isMe={winner.id === currentPlayerId}
           onPlayAgain={() => { resetGame(); navigate("/"); }}
+        />
+      )}
+
+      {/* Grid View Modal */}
+      {myPlayer && (
+        <AllCardsModal 
+          isOpen={showAllCards} 
+          onClose={() => setShowAllCards(false)} 
+          cards={myPlayer.hand} 
         />
       )}
     </div>

@@ -50,9 +50,9 @@ export function PlayerHand({ cards, isMyTurn, onPlayCards }: PlayerHandProps) {
       className="flex flex-col gap-2 px-3 pb-2"
     >
       {/* Card row — overlapping fan */}
-      <div className="flex justify-center items-end overflow-x-auto scrollbar-hide py-1 px-1">
+      <div className="flex justify-start sm:justify-center items-end overflow-x-auto scrollbar-hide py-1 px-4">
         {sorted.map((card, i) => (
-          <div key={card.id} className={i === 0 ? "" : overlapClass}>
+          <div key={card.id} className={i === 0 ? "shrink-0" : `${overlapClass} shrink-0`}>
             <CardComponent
               card={card}
               index={i}

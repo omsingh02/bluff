@@ -26,19 +26,19 @@ export function OpponentBar({ players, currentPlayerId, currentTurnIndex }: Oppo
             )}
           >
             <div className={cn(
-              "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-sm font-bold border-2 shrink-0",
+              "w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xs sm:text-base font-bold border-2 shrink-0",
               isTheirTurn
                 ? "border-primary bg-primary/20 text-primary"
                 : "border-border bg-muted text-muted-foreground"
             )}>
               {player.nickname.slice(0, 2).toUpperCase()}
             </div>
-            <span className="text-[10px] sm:text-xs text-muted-foreground truncate max-w-[48px] sm:max-w-[60px] leading-tight">
+            <span className="text-[11px] sm:text-sm text-foreground font-medium truncate max-w-[56px] sm:max-w-[70px] leading-tight">
               {player.nickname}
             </span>
             <span className={cn(
               "text-[10px] sm:text-xs font-mono font-bold leading-tight",
-              player.hand.length === 0 ? "text-secondary" : "text-foreground"
+              player.hand.length === 0 ? "text-secondary" : "text-muted-foreground"
             )}>
               {player.hand.length} 🃏
             </span>
