@@ -468,7 +468,7 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
 
     it("a bot facing a winning play almost always calls", async () => {
       let calls = 0;
-      const N = 30;
+      const N = 80; // true rate ≈ 85–95%; with 30 samples ~1 run in 200 dipped below 70% by pure chance
       for (let i = 0; i < N; i++) {
         const host = new Seat(db, `H${i}`);
         const v0 = await host.create({ bots: 1 });
@@ -710,6 +710,16 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
   describe("full games with bots", () => {
     interface GameStats { turns: number; calls: number; plays: number; pickups: number; winnerIsBot: boolean; capped: boolean }
 
+    /** The server may apply a due transition (window closed, turn timed out) between a poll and the action: "too late" is normal. */
+    async function tolerateRace(fn: () => Promise<unknown>) {
+      try {
+        await fn();
+      } catch (e) {
+        const m = (e as Error).message;
+        if (m !== "bad_phase" && m !== "not_your_turn") throw e;
+      }
+    }
+
     async function playGame(humans: number, bots: number, speed: string): Promise<GameStats> {
       const seats: Seat[] = [];
       const host = new Seat(db, "H0");
@@ -747,10 +757,10 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
             const rank = v.turn.rank as string;
             const honest = (v.me.hand as string[]).filter((c) => c.slice(0, -1) === rank);
             const cards = honest.length ? honest : [v.me.hand[Math.floor(Math.random() * v.me.hand.length)]];
-            await s.play(cards);
+            await tolerateRace(() => s.play(cards));
           } else if (v.me.canPass && !v.me.passed) {
-            if (Math.random() < 0.15) await s.callBluff();
-            else await s.pass();
+            if (Math.random() < 0.15) await tolerateRace(() => s.callBluff());
+            else await tolerateRace(() => s.pass());
           }
         }
         await db.shift(code, 1.3);

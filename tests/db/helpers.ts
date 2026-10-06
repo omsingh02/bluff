@@ -14,6 +14,9 @@ export type View = any;
 
 export const tok = () => randomBytes(24).toString("hex");
 
+/** pg emits 'error' on a client the server terminates (e.g. DROP DATABASE … FORCE at teardown); never let that be uncaught. */
+const ignoreErrors = () => undefined;
+
 const CAST: Record<string, string> = {
   p_player: "uuid",
   p_cards: "text[]",
@@ -36,6 +39,7 @@ export interface TestDb {
 export async function createTestDb(): Promise<TestDb> {
   if (!ADMIN_URL) throw new Error("TEST_DATABASE_URL is not set");
   const admin = new Client({ connectionString: ADMIN_URL });
+  admin.on("error", ignoreErrors);
   await admin.connect();
   await admin.query(`do $$ begin
     if not exists (select from pg_roles where rolname = 'anon') then create role anon nologin; end if;
@@ -57,8 +61,12 @@ export async function createTestDb(): Promise<TestDb> {
   await setup.end();
 
   const adminPool = new Pool({ connectionString: dbUrl, max: 4 });
+  adminPool.on("error", ignoreErrors);
+  adminPool.on("connect", (c) => c.on("error", ignoreErrors));
   // Every connection runs as `anon` from the start (what PostgREST does for unauthenticated requests).
   const anonPool = new Pool({ connectionString: dbUrl, max: 24, options: "-c role=anon" });
+  anonPool.on("error", ignoreErrors);
+  anonPool.on("connect", (c) => c.on("error", ignoreErrors));
 
   const rpc: TestDb["rpc"] = async (fn, args) => {
     const keys = Object.keys(args);
@@ -93,12 +101,13 @@ export async function createTestDb(): Promise<TestDb> {
     shift,
     anon: async () => {
       const c = new Client({ connectionString: dbUrl, options: "-c role=anon" });
+      c.on("error", ignoreErrors);
       await c.connect();
       return c;
     },
     close: async () => {
-      await anonPool.end();
-      await adminPool.end();
+      // Let every pooled connection finish closing before the database is dropped from under it.
+      await Promise.allSettled([anonPool.end(), adminPool.end()]);
       await admin.query(`drop database ${name} with (force)`);
       await admin.end();
     },
