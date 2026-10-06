@@ -104,7 +104,7 @@ npm run dev:ui                                    # → /dev/game.html?state=tur
 
 ## Deploy
 
-**1. Database** — one additive migration creates the private `game` schema and the public API (nothing existing is modified or dropped):
+**1. Database** — one migration creates the private `game` schema and the public API. Use a fresh Supabase project (the migration adds only the `game` schema and the 13 `public.lh_*` functions; it creates no tables in `public`):
 
 ```bash
 supabase login
@@ -113,8 +113,6 @@ supabase db push
 ```
 
 **2. Frontend (Vercel)** — the repo does not commit `.env`. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel project (Production **and** Preview), then deploy — a push to `main` does it when the project is Git-connected. `vercel.json` provides the SPA fallback (deep links like `/r/ABCDEF`), immutable asset caching and security headers including a CSP. The CSP's `connect-src` allows `https://*.supabase.co` / `wss://*.supabase.co`; **if you use a custom Supabase domain, add it there.**
-
-**Afterwards (optional cleanup)** — once the new site is live and you've played a game, retire the v1 prototype's world-writable tables with `supabase/post-deploy/drop_legacy_tables.sql` (run it by hand; it is intentionally not a migration).
 
 **3. Optional housekeeping** — abandoned rooms are also cleaned up opportunistically whenever a room is created. To sweep on a schedule with `pg_cron`:
 
@@ -129,8 +127,7 @@ select cron.schedule('lh-cleanup', '*/30 * * * *',
 ## Project layout
 
 ```
-supabase/migrations/   the engine: tables, rules, bots, API (one additive migration)
-supabase/post-deploy/  manual cleanup script for the v1 prototype tables
+supabase/migrations/   the engine: tables, rules, bots, API (a single migration)
 src/lib/               types (server contract), api client, sync engine (polling/realtime/clock), sound
 src/hooks/             useRoom, useServerNow/useCountdown
 src/components/game/   cards, hand, seats, table, action bar, reveal overlay
