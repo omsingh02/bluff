@@ -1,22 +1,40 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Liar&#39;s Hand</title>
-    <meta name="description" content="Lie to your friends, call their bluffs, and clear your hand in this neon-soaked multiplayer card game. Do you have the perfect poker face?">
+    <title>Liar's Hand — the bluffing card game</title>
+    <meta name="description" content="Play cards face-down, claim anything, and call your friends' bluffs. First to empty their hand wins. Free multiplayer bluffing card game — play with friends or bots." />
+    <meta name="theme-color" content="#07040f" />
+    <meta name="color-scheme" content="dark" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Liar&#39;s Hand">
-    <meta property="og:description" content="Lie to your friends, call their bluffs, and clear your hand in this neon-soaked multiplayer card game. Do you have the perfect poker face?">
-
+    <meta property="og:site_name" content="Liar's Hand" />
+    <meta property="og:title" content="Liar's Hand — the bluffing card game" />
+    <meta property="og:description" content="Lie to your friends. Call their bluffs. Clear your hand to win." />
+    <meta property="og:image" content="/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Liar&#39;s Hand">
-    <meta name="twitter:description" content="Lie to your friends, call their bluffs, and clear your hand in this neon-soaked multiplayer card game. Do you have the perfect poker face?">
+    <meta name="twitter:title" content="Liar's Hand — the bluffing card game" />
+    <meta name="twitter:description" content="Lie to your friends. Call their bluffs. Clear your hand to win." />
+    <meta name="twitter:image" content="/og.png" />
+
+    <style>
+      /* Avoid a white flash before the stylesheet loads. */
+      html, body { background: #07040f; margin: 0; }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="color:#f5f0e6;font-family:system-ui,sans-serif;padding:2rem;text-align:center">
+        Liar's Hand needs JavaScript to run. Please enable it and reload.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

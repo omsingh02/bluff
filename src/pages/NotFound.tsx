@@ -1,24 +1,33 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useDocumentTitle } from "./helpers";
 
-const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
-
+export function NotFound() {
+  const navigate = useNavigate();
+  useDocumentTitle("Wrong table · Liar's Hand");
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-5">
-      <div className="text-center">
-        <h1 className="mb-4 text-5xl font-black text-primary text-glow-purple">404</h1>
-        <p className="mb-4 text-lg text-muted-foreground">Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90 text-sm">
-          Return to Home
-        </a>
-      </div>
-    </div>
+    <main className="grid min-h-dvh grid-cols-[minmax(0,1fr)] place-items-center px-4 py-8 text-center safe-pt safe-pb" data-testid="not-found">
+      <motion.div
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 380, damping: 28 }}
+        className="flex max-w-sm flex-col items-center"
+      >
+        <p
+          aria-hidden
+          className="brand-gradient-text animate-float font-display text-[7rem] font-black leading-none tracking-tight drop-shadow-[0_0_30px_hsl(var(--primary)/0.4)]"
+        >
+          404
+        </p>
+        <h1 className="mt-4 font-display text-2xl font-bold tracking-tight">Wrong table</h1>
+        <p className="mt-2 text-sm text-muted">Nothing is being dealt here. The page you&apos;re after doesn&apos;t exist.</p>
+        <Button size="lg" className="mt-7" onClick={() => navigate("/")}>
+          <Home className="h-4 w-4" aria-hidden />
+          Back to start
+        </Button>
+      </motion.div>
+    </main>
   );
-};
-
-export default NotFound;
+}

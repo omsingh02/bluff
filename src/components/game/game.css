@@ -1,0 +1,75 @@
+/* In-game table styles that don't fit as Tailwind utilities. Imported by the game components. */
+
+/* Card back: indigo with a neon diamond lattice. Lattice spacing uses `em`, so it scales with the card. */
+.lh-card-back {
+  background:
+    radial-gradient(circle at 50% 50%, hsl(var(--accent) / 0.28) 0, transparent 42%),
+    repeating-linear-gradient(45deg, hsl(var(--primary) / 0.55) 0 1px, transparent 1px 0.62em),
+    repeating-linear-gradient(-45deg, hsl(var(--primary) / 0.55) 0 1px, transparent 1px 0.62em),
+    linear-gradient(160deg, hsl(256 56% 24%), hsl(262 62% 11%));
+}
+
+/* "Thinking…" dots for bots / autopilot seats. */
+@keyframes lh-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+.lh-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: lh-bounce 1.1s infinite ease-in-out;
+}
+.lh-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.lh-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Soft breathing glow used on whose-turn highlights. */
+@keyframes lh-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.lh-breathe {
+  animation: lh-breathe 2s ease-in-out infinite;
+}
+
+/* The felt gets a faint woven texture so large flat areas don't look like plastic. */
+.lh-felt-texture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image:
+    repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.04) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, hsl(0 0% 0% / 0.06) 0 1px, transparent 1px 3px);
+}
+
+/* Horizontal scrollers inside the table shouldn't show a scrollbar. */
+.lh-scroll-x {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lh-scroll-x::-webkit-scrollbar {
+  display: none;
+}

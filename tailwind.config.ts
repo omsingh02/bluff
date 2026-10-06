@@ -1,98 +1,75 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
+
+const token = (name: string) => `hsl(var(--${name}) / <alpha-value>)`;
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  prefix: "",
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
+      screens: { xs: "420px" },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        neon: {
-          purple: "hsl(var(--neon-purple))",
-          green: "hsl(var(--neon-green))",
-        },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+        background: token("background"),
+        foreground: token("foreground"),
+        surface: { DEFAULT: token("surface"), 2: token("surface-2") },
+        border: token("border"),
+        muted: token("muted"),
+        primary: { DEFAULT: token("primary"), foreground: token("primary-foreground") },
+        accent: token("accent"),
+        bluff: token("bluff"),
+        trust: token("trust"),
+        gold: token("gold"),
+        felt: { DEFAULT: token("felt"), deep: token("felt-deep") },
+        ring: token("ring"),
+        // playing-card palette
+        ivory: token("card-face"),
+        ink: token("card-ink"),
+        crimson: token("card-red"),
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+      fontFamily: {
+        sans: ['"Inter Variable"', "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        display: ['"Unbounded Variable"', '"Inter Variable"', "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      borderRadius: { "4xl": "2rem" },
+      boxShadow: {
+        "glow-primary": "0 0 0 1px hsl(var(--primary) / .5), 0 8px 30px -6px hsl(var(--primary) / .65)",
+        "glow-bluff": "0 0 0 1px hsl(var(--bluff) / .6), 0 8px 34px -4px hsl(var(--bluff) / .7)",
+        "glow-trust": "0 0 0 1px hsl(var(--trust) / .5), 0 8px 30px -6px hsl(var(--trust) / .5)",
+        "glow-gold": "0 0 0 1px hsl(var(--gold) / .6), 0 8px 34px -4px hsl(var(--gold) / .6)",
+        card: "0 1px 0 hsl(0 0% 100% / .6) inset, 0 8px 18px -6px rgb(0 0 0 / .7), 0 2px 4px rgb(0 0 0 / .4)",
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-6px)" } },
+        "pulse-glow": {
+          "0%,100%": { boxShadow: "0 0 0 1px hsl(var(--bluff) / .6), 0 8px 30px -6px hsl(var(--bluff) / .55)" },
+          "50%": { boxShadow: "0 0 0 2px hsl(var(--bluff) / .9), 0 8px 46px -2px hsl(var(--bluff) / .95)" },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        shimmer: { "100%": { transform: "translateX(100%)" } },
+        shake: {
+          "0%,100%": { transform: "translateX(0)" },
+          "20%": { transform: "translateX(-6px) rotate(-1deg)" },
+          "40%": { transform: "translateX(6px) rotate(1deg)" },
+          "60%": { transform: "translateX(-4px)" },
+          "80%": { transform: "translateX(4px)" },
         },
-        "pulse-neon": {
-          "0%, 100%": { opacity: "1", transform: "scale(1)" },
-          "50%": { opacity: "0.8", transform: "scale(1.05)" },
-        },
-        "shake": {
-          "0%, 100%": { transform: "translateX(0)" },
-          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-4px)" },
-          "20%, 40%, 60%, 80%": { transform: "translateX(4px)" },
+        "pop-in": { "0%": { opacity: "0", transform: "scale(.85)" }, "100%": { opacity: "1", transform: "scale(1)" } },
+        "spin-slow": { to: { transform: "rotate(360deg)" } },
+        "ring-pulse": {
+          "0%": { boxShadow: "0 0 0 0 hsl(var(--gold) / .55)" },
+          "100%": { boxShadow: "0 0 0 14px hsl(var(--gold) / 0)" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-neon": "pulse-neon 1.5s ease-in-out infinite",
-        "shake": "shake 0.5s ease-in-out",
+        float: "float 5s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 1.1s ease-in-out infinite",
+        shimmer: "shimmer 1.8s infinite",
+        shake: "shake .5s ease-in-out",
+        "pop-in": "pop-in .28s cubic-bezier(.2,1.3,.4,1) both",
+        "spin-slow": "spin-slow 24s linear infinite",
+        "ring-pulse": "ring-pulse 1.4s ease-out infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;

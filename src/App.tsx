@@ -1,40 +1,44 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster } from "sonner";
-import { GameProvider } from "@/contexts/GameContext";
-import Index from "./pages/Index.tsx";
-import Lobby from "./pages/Lobby.tsx";
-import GameRoom from "./pages/GameRoom.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { MotionConfig } from "framer-motion";
+import { AppToaster } from "@/components/shell/AppToaster";
+import { ConfigError } from "@/components/shell/ConfigError";
+import { configured } from "@/lib/supabase";
+import { sfx } from "@/lib/sound";
+import { Home } from "@/pages/Home";
+import { NotFound } from "@/pages/NotFound";
+import { RoomPage } from "@/pages/RoomPage";
 
-const queryClient = new QueryClient();
+export default function App() {
+  // Browsers only allow audio after a user gesture: unlock the synth on the first tap.
+  useEffect(() => {
+    const cleanup = () => {
+      window.removeEventListener("pointerup", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+    const unlock = () => {
+      sfx.unlock();
+      cleanup();
+    };
+    window.addEventListener("pointerup", unlock);
+    window.addEventListener("keydown", unlock);
+    return cleanup;
+  }, []);
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster
-      theme="dark"
-      className="toaster group"
-      toastOptions={{
-        classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-        },
-      }}
-    />
-    <GameProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/lobby/:roomCode" element={<Lobby />} />
-          <Route path="/game/:roomCode" element={<GameRoom />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </GameProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+  return (
+    <MotionConfig reducedMotion="user">
+      <AppToaster />
+      {configured ? (
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/r/:code" element={<RoomPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      ) : (
+        <ConfigError />
+      )}
+    </MotionConfig>
+  );
+}
