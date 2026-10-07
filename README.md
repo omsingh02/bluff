@@ -1,110 +1,200 @@
-# Liar's Hand
+<p align="center">
+  <img src="docs/banner.png" alt="Leery — the bluffing card game. Lie. Call it. Clear your hand." width="100%">
+</p>
 
-A realtime multiplayer **bluffing card game** — play cards face-down, claim anything, call your friends' bluffs, and be the first to empty your hand. Play with friends via a 6-letter room code, or jump straight into a game against bots. No accounts, no installs.
+<p align="center">
+  A realtime bluffing card game for 2–8 players.<br>
+  Play with friends or bots — no sign-up, and a server that can't be cheated.
+</p>
 
-React + TypeScript + Vite + Tailwind on the front, **Supabase (Postgres)** on the back. All game rules run **inside the database**, so the server is the only referee: nobody can peek at your hand, play out of turn, or fake a result.
+<p align="center">
+  <a href="https://leery.vercel.app"><strong>▶ Play now</strong></a> &nbsp;·&nbsp;
+  <a href="#how-to-play">How to play</a> &nbsp;·&nbsp;
+  <a href="#run-it-yourself">Run it yourself</a> &nbsp;·&nbsp;
+  <a href="#how-it-works">How it works</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/omsingh02/leery/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/omsingh02/leery/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-8b5cf6"></a>
+  <a href="https://leery.vercel.app"><img alt="Play online" src="https://img.shields.io/badge/play-leery.vercel.app-ec4899"></a>
+  <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178c6">
+  <img alt="Rules run in Postgres" src="https://img.shields.io/badge/rules-run%20in%20Postgres-336791">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/hero.webp" alt="Leery on three phones: the lobby, a challenge with the Call bluff button, and a bluff being caught" width="880">
+</p>
+
+## What is Leery?
+
+*leery* (adj.) — suspicious, wary of what you're being told. Which is exactly how you should feel about everyone at the table.
+
+Everyone knows the game: play cards face-down, say what they are, and let everyone else decide whether to believe you.
+Leery is that game built properly. Open a table from a six-letter code, fill empty seats with bots that have
+personalities, and trust nothing about the other players — **including the software**. The rules run inside the
+database, so nobody can peek at your hand, play out of turn, or fake a result.
+
+## Features
+
+- **2–8 players in seconds.** Share a 6-letter code or an invite link. No accounts, no installs, runs in any browser.
+- **Bots with personalities.** Cautious, balanced, reckless and paranoid bots bluff and call differently. Play solo
+  against 1–7 of them with a single tap.
+- **Three speeds.** Relaxed, Standard or Blitz set the turn timer and the window for calling a bluff.
+- **Never stalls.** Timers and bots run on the server: an AFK player is auto-played and then put on autopilot, a player
+  who leaves is replaced by a bot, and a silent host hands the role on.
+- **Cheat-proof by design.** Hands never leave the database, every action is validated server-side, and the only API is
+  a short list of functions rather than open tables. See [Security](#security).
+- **Built for phones.** Thumb-friendly controls, sound effects, a buzz when it's your turn, reduced-motion support and a
+  keyboard-accessible hand on desktop.
+- **Instant, but resilient.** Realtime pings when available, automatic fallback to polling when not.
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/home.webp" alt="Home: pick a name, create a room, play against bots or join with a code" width="200" title="Home">
+  <img src="docs/screenshots/lobby.webp" alt="Lobby: room code, invite link, players, bots and speed" width="200" title="Lobby">
+  <img src="docs/screenshots/table.webp" alt="Your turn: select 1 to 4 cards and play them face-down" width="200" title="Your turn">
+  <img src="docs/screenshots/challenge.webp" alt="Challenge window: call bluff or accept" width="200" title="Challenge">
+  <img src="docs/screenshots/reveal-bluff.webp" alt="A bluff is caught and the liar picks up the pile" width="200" title="Bluff caught">
+  <img src="docs/screenshots/reveal-honest.webp" alt="An honest play: the caller picks up the pile" width="200" title="Honest play">
+  <img src="docs/screenshots/game-over.webp" alt="Game over: final standings and a rematch button" width="200" title="Game over">
+</p>
+
+<p align="center">
+  <sub>Home · Lobby · Your turn · Challenge · Bluff caught · Honest play · Game over</sub>
+</p>
+
+On a big screen the table opens up, with up to seven opponents around the felt:
+
+<p align="center">
+  <img src="docs/screenshots/desktop-lobby.webp" alt="Leery lobby on desktop" width="435" title="Desktop lobby">
+  <img src="docs/screenshots/desktop-table.webp" alt="Leery table on desktop: an oval felt table, your hand along the bottom" width="435" title="Desktop table">
+</p>
 
 ## How to play
 
-1. One 52-card deck is dealt out. 2–8 players (bots can fill seats).
+1. One 52-card deck is dealt around the table.
 2. The **required rank advances every turn**: A, 2, 3 … K, A …
 3. On your turn, play **1–4 cards face-down** and claim they are all the required rank. You may lie.
 4. A short **challenge window** opens. Everyone else can **call bluff** or **accept**.
-5. If someone calls: the cards are revealed. If *any* card isn't the claimed rank, the liar picks up the whole pile — otherwise the **caller** does.
-6. First player to **empty their hand wins**. (Your last play can still be challenged.)
+5. If someone calls, the cards are revealed. If *any* card isn't the claimed rank, the **liar picks up the whole pile**;
+   otherwise the **caller** does.
+6. The first player to **empty their hand wins** — and a last play can still be challenged.
 
-Turn timers run on the server. If you go AFK you're auto-played, then put on autopilot; if you leave mid-game a bot takes over your cards.
+Bluff rarely, bluff big, and watch who hesitates.
 
-## Architecture
+## How it works
 
+```mermaid
+flowchart LR
+  A["Your browser<br/>React + TypeScript"] -->|"RPC (supabase-js)"| P["PostgREST<br/>13 public.leery_* functions"]
+  P --> D[("Postgres · private game schema<br/>rules · bots · timers")]
+  A -.->|"realtime ping (optional)"| O["Other players"]
 ```
- Browser (React) ──supabase-js RPC──▶  PostgREST ──▶ public.lh_*  (SECURITY DEFINER, the only API)
-      ▲   ▲                                                │
-      │   └── Realtime broadcast "ping" (optional) ◀───────┤
-      └────── polling at server-reported deadlines         ▼
-                                              game.rooms / game.players  (private schema, RLS on, no policies)
-                                              game.advance(): bots, timers, challenge windows
-```
 
-* **Private tables.** Everything lives in the `game` schema, which is never exposed through the Data API and has RLS enabled with no policies. The only entry points are the 13 `public.lh_*` functions, which are `SECURITY DEFINER` *by design*. (Supabase's advisor will flag that; it is intentional — see the header of the engine migration.)
-* **Identity without accounts.** Each device keeps a random 192-bit token in `localStorage`; only its SHA-256 hash is stored. Every RPC carries the token; each function checks it, the phase and the turn. A player's view contains only *their own* cards.
-* **No worker process.** Bots, turn timers and challenge windows advance **lazily**: every state poll (and every action) first applies any due transition under the room's row lock (`game.advance`). The game keeps moving as long as one human has the page open, and nothing stalls if the player whose turn it is closes their tab. Clients poll right at the server-reported `due` time, so transitions feel instant.
-* **Realtime is optional.** After a change, clients broadcast a tiny "ping" on a Realtime channel so others refetch immediately. If Realtime is blocked or disabled the game falls back to fast polling — nothing else changes.
-* **Concurrency.** Each mutating call locks the room row first (`FOR UPDATE`), then touches player rows: one writer per room, a fixed lock order, no deadlocks (covered by a concurrency test).
+- **The database is the referee.** Tables live in a private `game` schema that is never exposed through the Data API (RLS
+  on, no policies). The only way in is 13 `SECURITY DEFINER` functions (`leery_play`, `leery_call`, …) that check the
+  caller's token, the phase and whose turn it is, and only ever return the caller's *own* cards.
+- **Identity without accounts.** Each device keeps a random 192-bit token in `localStorage`; the server stores only its
+  SHA-256 hash. Clear your site data and you lose your seat — that's the trade for zero sign-up.
+- **No worker process.** Bots, turn timers and challenge windows advance **lazily**: every state poll first applies any
+  due transition under the room's row lock (`game.advance`). The game keeps moving as long as one human has the page
+  open, and nothing stalls if the player whose turn it is closes their tab. Clients poll right at the server-reported
+  deadline, so transitions feel instant.
+- **Realtime is an accelerator, not a dependency.** After a change, clients broadcast a tiny "ping" so others refetch
+  immediately. If Realtime is blocked or disabled the app falls back to fast polling and nothing else changes.
+- **Concurrency.** Every mutating call locks the room row first (`FOR UPDATE`), then touches player rows: one writer per
+  room and a fixed lock order, so no deadlocks (covered by a concurrency test).
+- **Bots are heuristics, not cheaters.** They play honestly when they can, bluff with the cards least useful to them, and
+  call bluff using what they can *prove* (only four of any rank exist), how many cards the player has left and their
+  personality. They never see anyone else's hand.
 
-Server-controlled seats (bots, AFK players, leavers) share the same heuristics: they play honestly when they can, bluff with the cards that will be least useful to them, and call bluff using what they can prove (only four of any rank exist), how many cards the player has left, and their personality (`cautious`, `balanced`, `reckless`, `paranoid`).
+## Security
 
-## Security & abuse protection
+The engine was reviewed for information leaks, privilege escalation, wedged states and abuse, and every confirmed finding
+has a regression test in [`tests/db/hardening.test.ts`](tests/db/hardening.test.ts).
 
-The engine was reviewed adversarially (information leaks, privilege escalation, wedged states, DoS) and every confirmed finding has a regression test in `tests/db/hardening.test.ts`. What that gives you:
+- **Nobody can see or fake anything.** Other players' hands and the face-down pile never leave the database. Card arrays
+  are shape-checked at the API *and* constrained in storage (Postgres arrays can otherwise carry custom lower bounds or
+  extra dimensions).
+- **No internals leak.** Expected errors are stable codes (`not_your_turn`, `bad_cards`, …); anything unexpected becomes a
+  bare `server_error` while the details stay in the server log. Every function pins `search_path = pg_catalog, pg_temp`.
+- **Abuse limits.** Room creation is limited per device (20/hour) and per client address (120/hour, via the proxy's
+  `cf-connecting-ip`), counting creations rather than live rooms; the address is kept next to the creation event for two
+  hours and then purged, and nothing else about a visitor is recorded. A global room cap (default 5000, change it with
+  `alter database … set leery.room_cap = '20000'`) retires the longest-idle lobbies instead of locking everyone out.
+  Names, codes, ban lists and card arrays are bounded and normalised (invisible and bidi characters stripped, full-width
+  and no-break look-alikes folded).
+- **Self-healing rooms.** A host who vanishes hands the role on after 60 s of silence, a player who leaves on their turn is
+  replaced instantly, and leaving always works — even in a wedged room.
+- **Unguessable codes.** Room codes are 6 characters (~887 million combinations).
 
-* **Nobody can see or fake anything.** Other players' hands and the face-down pile never leave the database; every action is validated against phase, turn and ownership. Card arrays are shape-checked at the API *and* constrained in storage (Postgres arrays can otherwise carry custom lower bounds or extra dimensions).
-* **No internal errors reach clients.** The engine's own errors are stable codes (`not_your_turn`, `bad_cards`, …); anything unexpected becomes a bare `server_error` and the details stay in the server log. All functions pin `search_path = pg_catalog, pg_temp`.
-* **Abuse limits.** Room creation is limited per device (20/hour) and per client address (120/hour, via the proxy's `cf-connecting-ip`), counting creations rather than live rooms. (For that, the caller's address from the proxy header is stored next to the creation event for 2 hours and then purged; nothing else about a visitor is recorded.) The global room cap (default 5000, `alter database … set lh.room_cap = '20000'`) retires the longest-idle lobbies instead of locking everyone out. Names, codes, ban lists and card arrays are bounded and normalised (invisible/bidi characters stripped, full-width and no-break look-alikes folded).
-* **Self-healing rooms.** A host who vanishes hands the role on after 60 s of silence; a player who leaves on their turn is replaced instantly; leaving always works, even if a room is wedged.
-* **Room codes are 6 characters** (~887M combinations) so lobbies can't be found by guessing.
+Known limits, worth knowing before a large public launch:
 
-Known limits — worth knowing before a large public launch:
+- Anyone holding the (public) API key can create rooms. The limits above blunt that, but a determined botnet needs an
+  edge rate-limiter such as Cloudflare in front.
+- Look-alike names using *different alphabets* (Cyrillic "Н" for Latin "H") are not detected.
+- The Realtime channel `leery:<code>` is a public broadcast: anyone who knows a code can send pings. Clients throttle
+  them (≤ 2 refreshes/s), so the worst case is wasted polling, never wrong data.
+- Device tokens travel in request bodies, so keep request/statement logging off for the API.
 
-* Anyone holding the (public) API key can create rooms; the limits above blunt that but a determined botnet needs an edge rate-limiter (e.g. Cloudflare) in front.
-* Look-alike names using *different alphabets* (Cyrillic "Н" for Latin "H") are not detected.
-* The Realtime channel `lh:<code>` is a public broadcast: anyone who knows a code can send "ping"s. Clients throttle them (≤ 2 refreshes/s), so the worst case is wasted polling, never wrong data.
-* Device tokens travel in request bodies — keep request/statement logging off for the API.
+Found a vulnerability? Please report it privately — see [SECURITY.md](SECURITY.md).
 
-## Run it locally
+## Run it yourself
 
 You need Node 20+.
 
 ```bash
-npm install
-cp .env.example .env.local     # then fill in the two VITE_SUPABASE_* values
-npm run dev                    # http://localhost:8080
+git clone https://github.com/omsingh02/leery.git && cd leery
+npm ci
+cp .env.example .env.local        # then fill in the two VITE_SUPABASE_* values
+npm run dev                       # http://localhost:8080
 ```
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | yes | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | yes | The project's publishable (anon) key — public by design |
+| `VITE_REALTIME` | no | Set to `off` to disable Realtime pings and use polling only |
 
 ### Backend option A — the real Supabase stack (needs Docker)
 
 ```bash
-supabase start                 # prints the local API URL and publishable/anon key
-supabase db reset              # applies supabase/migrations/*
+supabase start                    # prints the local API URL and publishable/anon key
+supabase db reset                 # applies supabase/migrations/*
 # put the printed URL + key into .env.local
 ```
 
-### Backend option B — lightweight (any Postgres, no Supabase stack)
+### Backend option B — any Postgres, no Supabase stack
 
-`scripts/dev-api.mjs` serves the app's RPC calls straight from Postgres (as the `anon` role, like PostgREST). Realtime isn't included, so the app uses polling.
+`scripts/dev-api.mjs` serves the app's RPC calls straight from Postgres (as the `anon` role, like PostgREST). Realtime isn't
+included, so the app polls.
 
 ```bash
-docker run -d --name lh-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
-DEV_DATABASE_URL=postgres://postgres:postgres@127.0.0.1:54399/postgres npm run dev:api      # :54321
+docker run -d --name leery-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
+DEV_DATABASE_URL=postgres://postgres:postgres@127.0.0.1:54399/postgres npm run dev:api     # serves :54321
 # .env.local → VITE_SUPABASE_URL=http://127.0.0.1:54321  VITE_SUPABASE_PUBLISHABLE_KEY=dev  VITE_REALTIME=off
 ```
 
-Handy for solo testing: open the app with `?as=alice` and `?as=bob` in two tabs to get two independent identities in one browser.
+Handy for solo testing: open the app with `?as=alice` and `?as=bob` in two tabs to get two independent players in one
+browser.
 
-### UI playground (no backend at all)
+### UI playground — no backend at all
 
-Every screen can be previewed from hand-written snapshots (`src/dev/fixtures.ts`), which is how the interface was built and screenshot-tested:
+Every screen can be previewed from hand-written snapshots (`src/dev/fixtures.ts`), which is how the interface was built and
+screenshot-tested:
 
 ```bash
-npm run dev:ui                                    # → /dev/game.html?state=turn-mine
-# other states:  turn-theirs · turn-bot · turn-auto · challenge-call · challenge-accused · reveal-bluff · reveal-honest · eight-players …
-# lobby / join / game-over / error screens:  /dev/shell.html?state=lobby-host | finished-win | preview | error-room_not_found | …   (?page=home)
+npm run dev:ui                    # → /dev/game.html?state=turn-mine
+# other states:  turn-theirs · turn-bot · challenge-call · challenge-accused · reveal-bluff · reveal-honest · eight-players …
+# lobby / join / game-over / error screens:  /dev/shell.html?state=lobby-host | finished-win | error-room_not_found | …   (?page=home)
 ```
-
-## Tests
-
-| Command | What it covers |
-| --- | --- |
-| `npm run typecheck` / `npm run lint` | TypeScript (app, UI playground, tests) and ESLint |
-| `npm test` | Unit tests for the client sync layer (polling at server deadlines, backoff, clock skew, stale-response handling, double-submit protection, error recovery) and the pure helpers. DB tests are skipped unless `TEST_DATABASE_URL` is set |
-| `npm run test:db` | The engine, against a throwaway Postgres in Docker: lobby rules, privacy (no card ever leaks, `anon` can't touch tables), every phase transition, timers/AFK, leaving, rematch, concurrency races, and full bot-driven games with card-conservation checks |
-| `npm run e2e` | Playwright drives the real UI against the real engine on a phone-sized viewport: solo game vs bots, invite link → two humans + a bot, reload restores your seat, finish + rematch, kicking, error screens. Needs a Postgres (see `playwright.config.ts`). `E2E_VISUAL=1 npm run e2e` runs the screenshot tour on mobile + desktop instead |
-
-`TEST_DATABASE_URL=<superuser url> npm run test:db` uses your own Postgres instead of Docker. `.github/workflows/ci.yml` runs all of it (verify, engine, e2e) on every push and pull request.
 
 ## Deploy
 
-**1. Database** — one migration creates the private `game` schema and the public API. Use a fresh Supabase project (the migration adds only the `game` schema and the 13 `public.lh_*` functions; it creates no tables in `public`):
+**1. Database** — one migration creates the private `game` schema and the public API. Use a fresh Supabase project (it adds
+only the `game` schema and the 13 `public.leery_*` functions, and creates no tables in `public`):
 
 ```bash
 supabase login
@@ -112,38 +202,80 @@ supabase link --project-ref <your-project-ref>      # asks for the database pass
 supabase db push
 ```
 
-**2. Frontend (Vercel)** — the repo does not commit `.env`. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel project (Production **and** Preview), then deploy — a push to `main` does it when the project is Git-connected. `vercel.json` provides the SPA fallback (deep links like `/r/ABCDEF`), immutable asset caching and security headers including a CSP. The CSP's `connect-src` allows `https://*.supabase.co` / `wss://*.supabase.co`; **if you use a custom Supabase domain, add it there.**
+Supabase's advisor will flag the `SECURITY DEFINER` functions. That is intentional — see the header of the engine
+migration for why.
 
-**3. Optional housekeeping** — abandoned rooms are also cleaned up opportunistically whenever a room is created. To sweep on a schedule with `pg_cron`:
+**2. Frontend (Vercel)** — set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel project (Production
+**and** Preview) and deploy; with a Git-connected project, a push to `main` does it. [`vercel.json`](vercel.json) provides
+the SPA fallback (deep links like `/r/ABCDEF`), immutable asset caching and security headers including a CSP. The CSP's
+`connect-src` allows `https://*.supabase.co` and `wss://*.supabase.co` — **if you use a custom Supabase domain, add it
+there.**
+
+**3. Optional housekeeping** — abandoned rooms are also cleaned up whenever a room is created. To sweep on a schedule with
+`pg_cron`:
 
 ```sql
-select cron.schedule('lh-cleanup', '*/30 * * * *',
+select cron.schedule('leery-cleanup', '*/30 * * * *',
   $$ delete from game.rooms r where r.last_active < now() - interval '6 hours'
        and not exists (select 1 from game.players p where p.room_id = r.id and p.last_seen > now() - interval '6 hours') $$);
 ```
 
-> The Supabase project doesn't need Auth, anonymous sign-ins or any dashboard toggles. Realtime Broadcast is used only as an accelerator.
-
-## Project layout
-
-```
-supabase/migrations/   the engine: tables, rules, bots, API (a single migration)
-src/lib/               types (server contract), api client, sync engine (polling/realtime/clock), sound
-src/hooks/             useRoom, useServerNow/useCountdown
-src/components/game/   cards, hand, seats, table, action bar, reveal overlay
-src/components/shell/  logo, rules, toaster, error boundary, banners
-src/pages/             Home, Lobby, Join, Game over, Room switchboard
-src/dev/ + dev/        fixtures for every game phase and a harness to preview screens without a backend
-tests/db/              engine tests          tests/unit/  client logic          tests/e2e/   Playwright specs
-scripts/               test-db.sh, dev-api.mjs, generate-brand-assets.mjs
-```
+The Supabase project doesn't need Auth, anonymous sign-ins or any dashboard toggles; Realtime Broadcast is used only as an
+accelerator.
 
 ## Tuning
 
-Game feel lives in a few SQL functions (new migration to change them): `game.speed_*_seconds` (turn/challenge timers), `game.style` (bot personalities: `lie`, `greed`, `sus`), `game.plan_bot_call` (when bots call bluff) and `game.choose_play` (what they play). The simulation in `npm run test:db` prints average game length and call rates so changes are easy to evaluate.
+Game feel lives in a few SQL functions (change them with a new migration): `game.speed_*_seconds` (turn and challenge
+timers), `game.style` (bot personalities: `lie`, `greed`, `sus`), `game.plan_bot_call` (when bots call bluff) and
+`game.choose_play` (what they play). The simulation in `npm run test:db` prints average game length and call rates, so
+changes are easy to evaluate.
+
+## Tests
+
+| Command | What it covers |
+| --- | --- |
+| `npm run typecheck` · `npm run lint` | TypeScript (app, UI playground, tests) and ESLint |
+| `npm test` | Unit tests for the client sync layer (polling at server deadlines, backoff, clock skew, stale responses, double-submit protection, error recovery) and the pure helpers |
+| `npm run test:db` | The engine against a throwaway Postgres in Docker: lobby rules, privacy (no card ever leaks, `anon` can't touch tables), every phase transition, timers and AFK, leaving, rematch, concurrency races, abuse limits, and full bot-played games with card-conservation checks |
+| `npm run e2e` | Playwright drives the real UI against the real engine on a phone viewport: solo game vs bots, invite link → two humans + a bot, reload restores your seat, finish + rematch, kicking, error screens. Needs a Postgres (see `playwright.config.ts`); `E2E_VISUAL=1` runs the screenshot tour instead |
+
+`TEST_DATABASE_URL=<superuser url> npm run test:db` uses your own Postgres instead of Docker.
+[CI](.github/workflows/ci.yml) runs all of it on every push and pull request.
+
+## Project structure
+
+```
+supabase/migrations/   the engine: tables, rules, bots and API in a single migration
+src/lib/               types (the server contract), API client, sync engine (polling / realtime / clock), sound
+src/hooks/             useRoom, useServerNow
+src/components/game/   cards, hand, seats, table, action bar, reveal overlay
+src/components/shell/  logo, rules, toaster, error boundary, banners
+src/pages/             home, lobby, join, game over, room switchboard
+src/dev/ + dev/        fixtures for every game phase and a harness to preview screens without a backend
+tests/db/              engine tests          tests/unit/   client logic          tests/e2e/   Playwright specs
+scripts/               test-db.sh, dev-api.mjs, generate-brand-assets.mjs (logo, icons, screenshots, social images)
+docs/                  logo files, banner, social preview and the screenshots used here
+```
 
 ## Troubleshooting
 
-* *"The game server isn't set up yet"* — the migrations haven't been applied to the project in `VITE_SUPABASE_URL`.
-* *Updates feel a second slow* — Realtime is blocked; the game polls instead. Nothing is broken.
-* *"You're not part of this room" after clearing site data* — your device token is gone; ask the host to start a new game, or join a lobby again.
+- **"The game server isn't set up yet"** — the migration hasn't been applied to the project in `VITE_SUPABASE_URL`.
+- **Updates feel about a second slow** — Realtime is blocked, so the game polls instead. Nothing is broken.
+- **"You're not part of this room" after clearing site data** — your device token is gone; join a lobby again or ask the
+  host to start a new game.
+
+## Built with
+
+React 18 · TypeScript (strict) · Vite · Tailwind CSS · Framer Motion · Radix UI · Supabase (Postgres, PostgREST,
+Realtime) · Vitest · Playwright · Vercel.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE) © 2026 [Om Singh](https://github.com/omsingh02).
+
+Fonts: [Inter](https://rsms.me/inter/) and [Unbounded](https://github.com/googlefonts/unbounded) (SIL Open Font License 1.1,
+self-hosted via [Fontsource](https://fontsource.org)). Icons: [Lucide](https://lucide.dev) (ISC).
