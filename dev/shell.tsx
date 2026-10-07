@@ -75,7 +75,7 @@ createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <MotionConfig reducedMotion="user">
       <AppToaster />
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter>
         <Body />
       </MemoryRouter>
     </MotionConfig>

@@ -165,7 +165,7 @@ function SimApp({ reduced }: { reduced: boolean }) {
 
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "user"}>
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter>
         <GameScreen room={room} />
       </MemoryRouter>
       <Toaster theme="dark" />
@@ -215,7 +215,7 @@ function StaticApp() {
   );
   return (
     <MotionConfig reducedMotion={reduced ? "always" : "user"}>
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter>
         <GameScreen room={room} />
       </MemoryRouter>
       <Toaster theme="dark" />

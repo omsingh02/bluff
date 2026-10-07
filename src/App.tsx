@@ -29,7 +29,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <AppToaster />
       {configured ? (
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/r/:code" element={<RoomPage />} />
