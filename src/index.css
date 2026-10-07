@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /*
- * Liar's Hand — "neon noir" design tokens.
+ * Leery — "neon noir" design tokens.
  * Colours are HSL triplets so Tailwind can apply alpha (`bg-primary/20`).
  *   violet = brand · pink = accent · red = BLUFF · mint = trust/honest · gold = turn/winner · teal felt = the table
  */

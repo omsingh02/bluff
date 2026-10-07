@@ -20,7 +20,7 @@ const ns = (() => {
 const memory = new Map<string, string>(); // fallback when storage is unavailable (private mode)
 
 function read(key: string): string | null {
-  const k = `lh.${key}${ns}`;
+  const k = `leery.${key}${ns}`;
   try {
     return window.localStorage.getItem(k) ?? memory.get(k) ?? null;
   } catch {
@@ -29,7 +29,7 @@ function read(key: string): string | null {
 }
 
 function write(key: string, value: string | null) {
-  const k = `lh.${key}${ns}`;
+  const k = `leery.${key}${ns}`;
   try {
     if (value === null) window.localStorage.removeItem(k);
     else window.localStorage.setItem(k, value);

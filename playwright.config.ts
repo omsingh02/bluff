@@ -7,7 +7,7 @@ import path from "node:path";
  *
  * They need a Postgres (any 14+) and use scripts/dev-api.mjs as the PostgREST stand-in, so the
  * full Supabase stack isn't required. Provide a superuser URL, e.g.
- *   docker run -d --name lh-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
+ *   docker run -d --name leery-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
  *   E2E_DATABASE_URL=postgres://postgres:postgres@127.0.0.1:54399/postgres npm run e2e
  *
  * Set E2E_CHROMIUM=/usr/bin/chromium to use a system browser instead of Playwright's download.
@@ -50,7 +50,7 @@ export default defineConfig({
       command: "node scripts/dev-api.mjs",
       url: `http://127.0.0.1:${API_PORT}/health`,
       reuseExistingServer: !process.env.CI,
-      env: { PORT: String(API_PORT), DEV_DATABASE_URL: DB, DEV_DB_NAME: "lh_e2e", RESET: "1" },
+      env: { PORT: String(API_PORT), DEV_DATABASE_URL: DB, DEV_DB_NAME: "leery_e2e", RESET: "1" },
       timeout: 60_000,
     },
     {
@@ -58,7 +58,7 @@ export default defineConfig({
       url: `http://127.0.0.1:${WEB_PORT}`,
       reuseExistingServer: !process.env.CI,
       env: {
-        VITE_CACHE_DIR: path.join(os.tmpdir(), "lh-vite-cache"),
+        VITE_CACHE_DIR: path.join(os.tmpdir(), "leery-vite-cache"),
         VITE_SUPABASE_URL: `http://127.0.0.1:${API_PORT}`,
         VITE_SUPABASE_PUBLISHABLE_KEY: "e2e-key",
         VITE_REALTIME: "off",

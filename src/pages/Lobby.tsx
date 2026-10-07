@@ -77,8 +77,8 @@ export function Lobby({ room, view }: { room: RoomController; view: RoomView }) 
   async function share() {
     try {
       await navigator.share({
-        title: "Liar's Hand",
-        text: `Join my game of Liar's Hand — room ${code}`,
+        title: "Leery",
+        text: `Join my game of Leery — room ${code}`,
         url: inviteLink(code),
       });
     } catch (e) {

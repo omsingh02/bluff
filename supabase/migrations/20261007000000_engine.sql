@@ -1,5 +1,5 @@
 -- =====================================================================================
--- Liar's Hand — server-authoritative game engine
+-- Leery — server-authoritative game engine
 -- =====================================================================================
 --
 -- THE GAME (a.k.a. "I Doubt It" / "Cheat")
@@ -19,7 +19,7 @@
 -- SECURITY MODEL
 --   * All tables live in the private `game` schema (never exposed through the Data API) with RLS
 --     enabled and no policies, and no privileges for anon/authenticated.
---   * The only way in is the `public.lh_*` functions below. They are SECURITY DEFINER *on purpose*
+--   * The only way in is the `public.leery_*` functions below. They are SECURITY DEFINER *on purpose*
 --     (they ARE the API): every call must present a random device token whose SHA-256 hash is the
 --     player's identity. Each function validates turn/phase/ownership server-side and only ever
 --     returns the caller's own hand — other players' cards never leave the database.
@@ -29,11 +29,11 @@
 -- ABUSE LIMITS
 --   Room creation is rate-limited per device token (20/hour) and per client address when the HTTP layer
 --   exposes one (120/hour, `cf-connecting-ip`), counting creations rather than live rooms. The global
---   room cap (default 5000, `lh.room_cap`) retires the longest-idle lobbies instead of refusing everyone.
+--   room cap (default 5000, `leery.room_cap`) retires the longest-idle lobbies instead of refusing everyone.
 --   Banned-token lists, names, codes and card arrays are all bounded and validated before any real work.
 --
 -- TIME / BOTS
---   There is no worker process. Timers and bots are advanced LAZILY: every `lh_get_state` poll (and
+--   There is no worker process. Timers and bots are advanced LAZILY: every `leery_get_state` poll (and
 --   every action) first applies any due transitions under the room's row lock (`game.advance`), so
 --   a game keeps moving as long as at least one human has the page open, and nothing breaks if the
 --   player whose turn it is closes their tab (they are auto-played, then put on autopilot).
@@ -45,7 +45,7 @@
 
 create schema if not exists game;
 revoke all on schema game from public, anon, authenticated;
-comment on schema game is 'Liar''s Hand engine. Private: not exposed through the Data API.';
+comment on schema game is 'Leery engine. Private: not exposed through the Data API.';
 
 -- -------------------------------------------------------------------------------------
 -- Tables
@@ -937,7 +937,7 @@ as $$
 $$;
 
 -- -------------------------------------------------------------------------------------
--- API implementation (called only through the public.lh_* wrappers)
+-- API implementation (called only through the public.leery_* wrappers)
 -- -------------------------------------------------------------------------------------
 
 -- Common entry for member actions: validates the token, locks the room, applies due transitions.
@@ -1006,9 +1006,9 @@ begin
     raise exception 'rate_limited';   -- generous: a whole classroom may share one address
   end if;
 
-  -- Global cap (tunable: `alter database … set lh.room_cap = '20000'`). At the cap, retire the longest-idle
+  -- Global cap (tunable: `alter database … set leery.room_cap = '20000'`). At the cap, retire the longest-idle
   -- lobbies / finished games instead of refusing everyone.
-  v_cap := coalesce(nullif(current_setting('lh.room_cap', true), '')::integer, 5000);
+  v_cap := coalesce(nullif(current_setting('leery.room_cap', true), '')::integer, 5000);
   if (select count(*) from game.rooms) >= v_cap then
     delete from game.rooms where id in (
       select id from game.rooms
@@ -1406,7 +1406,7 @@ $$;
 -- untouched, and turns anything unexpected into a bare 'server_error': raw Postgres errors can carry DETAIL
 -- such as "Failing row contains (…)", which must never reach a client. The real cause goes to the server log.
 
-create function public.lh_create_room(p_token text, p_name text, p_speed text default 'standard', p_bots integer default 0, p_start boolean default false)
+create function public.leery_create_room(p_token text, p_name text, p_speed text default 'standard', p_bots integer default 0, p_start boolean default false)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1414,12 +1414,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_create_room failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_create_room failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_join_room(p_token text, p_code text, p_name text)
+create function public.leery_join_room(p_token text, p_code text, p_name text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1427,12 +1427,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_join_room failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_join_room failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_get_state(p_token text, p_code text)
+create function public.leery_get_state(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1440,12 +1440,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_get_state failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_get_state failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_add_bot(p_token text, p_code text)
+create function public.leery_add_bot(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1453,12 +1453,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_add_bot failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_add_bot failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_remove_player(p_token text, p_code text, p_player uuid)
+create function public.leery_remove_player(p_token text, p_code text, p_player uuid)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1466,12 +1466,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_remove_player failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_remove_player failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_set_speed(p_token text, p_code text, p_speed text)
+create function public.leery_set_speed(p_token text, p_code text, p_speed text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1479,12 +1479,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_set_speed failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_set_speed failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_start(p_token text, p_code text)
+create function public.leery_start(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1492,12 +1492,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_start failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_start failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_play(p_token text, p_code text, p_cards text[])
+create function public.leery_play(p_token text, p_code text, p_cards text[])
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1505,12 +1505,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_play failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_play failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_call(p_token text, p_code text)
+create function public.leery_call(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1518,12 +1518,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_call failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_call failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_pass(p_token text, p_code text)
+create function public.leery_pass(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1531,12 +1531,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_pass failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_pass failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_resume(p_token text, p_code text)
+create function public.leery_resume(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1544,12 +1544,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_resume failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_resume failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_rematch(p_token text, p_code text)
+create function public.leery_rematch(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1557,12 +1557,12 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_rematch failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_rematch failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
 
-create function public.lh_leave(p_token text, p_code text)
+create function public.leery_leave(p_token text, p_code text)
 returns jsonb language plpgsql volatile security definer set search_path = pg_catalog, pg_temp
 as $$
 begin
@@ -1570,7 +1570,7 @@ begin
 exception
   when raise_exception then raise;
   when others then
-    raise log 'lh_leave failed [%]: %', sqlstate, sqlerrm;
+    raise log 'leery_leave failed [%]: %', sqlstate, sqlerrm;
     raise exception 'server_error';
 end
 $$;
@@ -1579,33 +1579,33 @@ $$;
 revoke all on all functions in schema game from public;
 revoke all on all functions in schema game from anon, authenticated;
 
-revoke all on function public.lh_create_room(text, text, text, integer, boolean) from public;
-revoke all on function public.lh_join_room(text, text, text) from public;
-revoke all on function public.lh_get_state(text, text) from public;
-revoke all on function public.lh_add_bot(text, text) from public;
-revoke all on function public.lh_remove_player(text, text, uuid) from public;
-revoke all on function public.lh_set_speed(text, text, text) from public;
-revoke all on function public.lh_start(text, text) from public;
-revoke all on function public.lh_play(text, text, text[]) from public;
-revoke all on function public.lh_call(text, text) from public;
-revoke all on function public.lh_pass(text, text) from public;
-revoke all on function public.lh_resume(text, text) from public;
-revoke all on function public.lh_rematch(text, text) from public;
-revoke all on function public.lh_leave(text, text) from public;
+revoke all on function public.leery_create_room(text, text, text, integer, boolean) from public;
+revoke all on function public.leery_join_room(text, text, text) from public;
+revoke all on function public.leery_get_state(text, text) from public;
+revoke all on function public.leery_add_bot(text, text) from public;
+revoke all on function public.leery_remove_player(text, text, uuid) from public;
+revoke all on function public.leery_set_speed(text, text, text) from public;
+revoke all on function public.leery_start(text, text) from public;
+revoke all on function public.leery_play(text, text, text[]) from public;
+revoke all on function public.leery_call(text, text) from public;
+revoke all on function public.leery_pass(text, text) from public;
+revoke all on function public.leery_resume(text, text) from public;
+revoke all on function public.leery_rematch(text, text) from public;
+revoke all on function public.leery_leave(text, text) from public;
 
-grant execute on function public.lh_create_room(text, text, text, integer, boolean) to anon, authenticated;
-grant execute on function public.lh_join_room(text, text, text) to anon, authenticated;
-grant execute on function public.lh_get_state(text, text) to anon, authenticated;
-grant execute on function public.lh_add_bot(text, text) to anon, authenticated;
-grant execute on function public.lh_remove_player(text, text, uuid) to anon, authenticated;
-grant execute on function public.lh_set_speed(text, text, text) to anon, authenticated;
-grant execute on function public.lh_start(text, text) to anon, authenticated;
-grant execute on function public.lh_play(text, text, text[]) to anon, authenticated;
-grant execute on function public.lh_call(text, text) to anon, authenticated;
-grant execute on function public.lh_pass(text, text) to anon, authenticated;
-grant execute on function public.lh_resume(text, text) to anon, authenticated;
-grant execute on function public.lh_rematch(text, text) to anon, authenticated;
-grant execute on function public.lh_leave(text, text) to anon, authenticated;
+grant execute on function public.leery_create_room(text, text, text, integer, boolean) to anon, authenticated;
+grant execute on function public.leery_join_room(text, text, text) to anon, authenticated;
+grant execute on function public.leery_get_state(text, text) to anon, authenticated;
+grant execute on function public.leery_add_bot(text, text) to anon, authenticated;
+grant execute on function public.leery_remove_player(text, text, uuid) to anon, authenticated;
+grant execute on function public.leery_set_speed(text, text, text) to anon, authenticated;
+grant execute on function public.leery_start(text, text) to anon, authenticated;
+grant execute on function public.leery_play(text, text, text[]) to anon, authenticated;
+grant execute on function public.leery_call(text, text) to anon, authenticated;
+grant execute on function public.leery_pass(text, text) to anon, authenticated;
+grant execute on function public.leery_resume(text, text) to anon, authenticated;
+grant execute on function public.leery_rematch(text, text) to anon, authenticated;
+grant execute on function public.leery_leave(text, text) to anon, authenticated;
 
-comment on function public.lh_get_state(text, text) is
+comment on function public.leery_get_state(text, text) is
   'Heartbeat + lazy timer/bot advancement + snapshot for the caller (or a preview if not a member).';

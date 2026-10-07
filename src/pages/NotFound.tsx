@@ -6,7 +6,7 @@ import { useDocumentTitle } from "./helpers";
 
 export function NotFound() {
   const navigate = useNavigate();
-  useDocumentTitle("Wrong table · Liar's Hand");
+  useDocumentTitle("Wrong table · Leery");
   return (
     <main className="grid min-h-dvh grid-cols-[minmax(0,1fr)] place-items-center px-4 py-8 text-center safe-pt safe-pb" data-testid="not-found">
       <motion.div

@@ -112,7 +112,7 @@ export function Table({ view, serverNow, pileRef, registerSeat, children }: Tabl
         <div className={cn("relative flex-1", short ? "min-h-[240px]" : "min-h-[320px]")}>
           <div
             className={cn(
-              "felt lh-felt-texture absolute inset-x-[2%] bottom-1 top-[17%] flex flex-col overflow-y-auto rounded-[999px] px-10 pb-4 no-scrollbar",
+              "felt leery-felt-texture absolute inset-x-[2%] bottom-1 top-[17%] flex flex-col overflow-y-auto rounded-[999px] px-10 pb-4 no-scrollbar",
               short ? "pt-14" : "pt-20",
             )}
           >
@@ -138,7 +138,7 @@ export function Table({ view, serverNow, pileRef, registerSeat, children }: Tabl
         <div className="flex flex-wrap items-start justify-center gap-x-1 gap-y-2">{opponents.map((p) => renderSeat(p))}</div>
       </div>
       <div className="min-h-0 flex-1 px-3 py-2">
-        <div className="felt lh-felt-texture relative flex h-full flex-col overflow-y-auto rounded-[2rem] px-3 py-3 no-scrollbar">
+        <div className="felt leery-felt-texture relative flex h-full flex-col overflow-y-auto rounded-[2rem] px-3 py-3 no-scrollbar">
           <div className="m-auto flex flex-col items-center gap-3">{feltContent}</div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Suit } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { LogoMark } from "./Logo";
 
 /** Crisp vector suit pip. Inherits colour from `currentColor`. */
 export function SuitGlyph({ suit, className }: { suit: Suit; className?: string }) {
@@ -40,7 +41,7 @@ const ANGLES = [-34, -17, 0, 17, 34];
 
 function FanFace({ card }: { card: FanCard }) {
   if (!card.suit) {
-    // The liar's card: face-down with a glowing spade.
+    // The liar's card: face-down, with the brand's side-eye watching you.
     return (
       <div
         className="relative grid h-full w-full place-items-center overflow-hidden rounded-[0.55em] border border-primary/60 shadow-card"
@@ -50,7 +51,7 @@ function FanFace({ card }: { card: FanCard }) {
         }}
       >
         <div className="absolute inset-[0.35em] rounded-[0.35em] border border-white/15" />
-        <SuitGlyph suit="S" className="h-[2.1em] w-[2.1em] text-primary drop-shadow-[0_0_10px_hsl(var(--primary))]" />
+        <LogoMark tile={false} size="2.6em" className="relative drop-shadow-[0_0_10px_hsl(var(--primary))]" />
       </div>
     );
   }

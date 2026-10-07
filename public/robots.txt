@@ -1,14 +1,6 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Index the landing page; private game rooms (/r/CODE) are not for crawlers.
 User-agent: *
 Allow: /
+Disallow: /r/
+
+Sitemap: https://leery.vercel.app/sitemap.xml

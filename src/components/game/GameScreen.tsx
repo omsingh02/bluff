@@ -199,7 +199,7 @@ function GameScreenInner({ room, view }: { room: RoomController; view: RoomView 
 
   useEffect(() => {
     const previous = document.title;
-    document.title = myTurn ? "▶ Your turn · Liar's Hand" : `Liar's Hand · ${view.code}`;
+    document.title = myTurn ? "▶ Your turn · Leery" : `Leery · ${view.code}`;
     return () => {
       document.title = previous;
     };

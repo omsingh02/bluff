@@ -14,7 +14,7 @@ command -v docker >/dev/null 2>&1 || {
   exit 1
 }
 
-NAME="lh-test-pg-$$"
+NAME="leery-test-pg-$$"
 cleanup() { docker rm -f "$NAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 

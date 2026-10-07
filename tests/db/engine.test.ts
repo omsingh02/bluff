@@ -2,12 +2,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cardsIn, createTestDb, expectError, hasDb, Seat, set, type TestDb, type View } from "./helpers";
 
 /**
- * Engine tests run against a real Postgres (see scripts/test-db.sh). They call the public `lh_*`
+ * Engine tests run against a real Postgres (see scripts/test-db.sh). They call the public `leery_*`
  * functions exactly as PostgREST would (as the `anon` role) and use superuser SQL only to set up
  * scenarios and to inspect hidden state. Time never passes by sleeping: `db.shift()` moves every
  * stored timestamp into the past, which is equivalent to the clock moving forward.
  */
-describe.skipIf(!hasDb)("Liar's Hand engine", () => {
+describe.skipIf(!hasDb)("Leery engine", () => {
   let db: TestDb;
 
   beforeAll(async () => {
@@ -104,8 +104,8 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
     });
 
     it("rejects unknown rooms, malformed tokens and shows a preview to outsiders", async () => {
-      await expectError(db.rpc("lh_get_state", { p_token: "x".repeat(48), p_code: "ZZZZZ" }), "room_not_found");
-      await expectError(db.rpc("lh_get_state", { p_token: "short", p_code: "ZZZZZ" }), "bad_request");
+      await expectError(db.rpc("leery_get_state", { p_token: "x".repeat(48), p_code: "ZZZZZ" }), "room_not_found");
+      await expectError(db.rpc("leery_get_state", { p_token: "short", p_code: "ZZZZZ" }), "bad_request");
       const host = new Seat(db, "Alex");
       const { code } = await host.create();
       const outsider = new Seat(db, "Out", undefined, code);
@@ -201,7 +201,7 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
         await expect(c.query("select game.api_get_state('x','y')")).rejects.toThrow(/permission denied/i);
         await expect(c.query("select game.view(null, null, now())")).rejects.toThrow(/permission denied/i);
         // …but the public API works.
-        const r = await c.query("select public.lh_get_state($1, 'ZZZZZ')", ["z".repeat(40)]).catch((e: Error) => e);
+        const r = await c.query("select public.leery_get_state($1, 'ZZZZZ')", ["z".repeat(40)]).catch((e: Error) => e);
         expect((r as Error).message).toBe("room_not_found");
       } finally {
         await c.end();
@@ -283,7 +283,7 @@ describe.skipIf(!hasDb)("Liar's Hand engine", () => {
       await expectError(seats[1].play(["9D"]), "bad_cards"); // not in hand
       await expectError(seats[1].play(["AS", "AS"]), "bad_cards"); // duplicate
       await expectError(seats[1].play(["AS", "AH", "5C", "6C", "7C"]), "bad_cards"); // five cards
-      await expectError(seats[1].call("lh_play", { p_cards: null as unknown as string[] }), "bad_cards");
+      await expectError(seats[1].call("leery_play", { p_cards: null as unknown as string[] }), "bad_cards");
 
       const v = await seats[1].play(["AS", "AH"]);
       expect(v.status).toBe("challenge");

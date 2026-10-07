@@ -7,7 +7,7 @@ const ADMIN = process.env.E2E_DATABASE_URL ?? "postgres://postgres:postgres@127.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function sql<T = Record<string, any>>(q: string, params: unknown[] = []): Promise<T[]> {
   const u = new URL(ADMIN);
-  u.pathname = "/lh_e2e";
+  u.pathname = "/leery_e2e";
   const c = new Client({ connectionString: u.toString() });
   await c.connect();
   try {

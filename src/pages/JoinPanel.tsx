@@ -39,7 +39,7 @@ export function JoinPanel({ room, preview }: { room: RoomController; preview: Ro
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
 
-  useDocumentTitle(`Join ${preview.code} · Liar's Hand`);
+  useDocumentTitle(`Join ${preview.code} · Leery`);
 
   async function submit(e: FormEvent) {
     e.preventDefault();

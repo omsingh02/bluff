@@ -149,7 +149,7 @@ export const Seat = memo(
       >
         <div className="relative rounded-full" style={{ width: d.avatar, height: d.avatar }}>
           {active && <span aria-hidden className="absolute inset-0 rounded-full animate-ring-pulse" />}
-          {active && <span aria-hidden className="lh-breathe absolute -inset-3 rounded-full bg-gold/25 blur-xl" />}
+          {active && <span aria-hidden className="leery-breathe absolute -inset-3 rounded-full bg-gold/25 blur-xl" />}
           <Avatar name={player.name} color={player.color} bot={player.bot} size={d.avatar} className={cn("transition-shadow", ring)} />
           {active && deadline != null && turnSince != null && (
             <TimerRing since={turnSince} deadline={deadline} serverNow={serverNow} size={d.avatar} />
@@ -192,9 +192,9 @@ export const Seat = memo(
         <div className="flex min-h-[18px] flex-wrap items-center justify-center gap-1" aria-hidden>
           {thinking ? (
             <span className="inline-flex items-center gap-[3px] text-gold" title="Thinking…">
-              <i className="lh-dot" />
-              <i className="lh-dot" />
-              <i className="lh-dot" />
+              <i className="leery-dot" />
+              <i className="leery-dot" />
+              <i className="leery-dot" />
             </span>
           ) : tag ? (
             <span className={cn("whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-bold uppercase tracking-wide", role ? ROLE_TAG[role] : "bg-white/10 text-muted")}>

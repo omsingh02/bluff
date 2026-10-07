@@ -102,7 +102,7 @@ export function GameOver({ room, view }: { room: RoomController; view: RoomView 
     id === winnerId ? 1 : 2 + players.filter((o) => o.id !== winnerId && o.cards < cards).length;
   const myPlace = placeOf(me.id, players.find((p) => p.id === me.id)?.cards ?? 0);
 
-  useDocumentTitle(iWon ? "You won! · Liar's Hand" : `${winner?.name ?? "Someone"} won · Liar's Hand`);
+  useDocumentTitle(iWon ? "You won! · Leery" : `${winner?.name ?? "Someone"} won · Leery`);
 
   const sounded = useRef(false);
   useEffect(() => {

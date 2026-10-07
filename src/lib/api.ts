@@ -88,10 +88,10 @@ export interface CreateOptions {
   start?: boolean;
 }
 
-/** Thin typed wrappers over the `lh_*` database functions. Every call returns the caller's fresh RoomView. */
+/** Thin typed wrappers over the `leery_*` database functions. Every call returns the caller's fresh RoomView. */
 export const api = {
   createRoom: (token: string, name: string, opts: CreateOptions = {}) =>
-    rpc<RoomView>("lh_create_room", {
+    rpc<RoomView>("leery_create_room", {
       p_token: token,
       p_name: name,
       p_speed: opts.speed ?? "standard",
@@ -99,20 +99,20 @@ export const api = {
       p_start: opts.start ?? false,
     }),
   joinRoom: (token: string, code: string, name: string) =>
-    rpc<RoomView>("lh_join_room", { p_token: token, p_code: code, p_name: name }),
+    rpc<RoomView>("leery_join_room", { p_token: token, p_code: code, p_name: name }),
   /** Heartbeat + lazy timer/bot advancement + snapshot. Returns a RoomPreview if you're not a member. */
-  getState: (token: string, code: string) => rpc<StateResponse>("lh_get_state", { p_token: token, p_code: code }),
-  addBot: (token: string, code: string) => rpc<RoomView>("lh_add_bot", { p_token: token, p_code: code }),
+  getState: (token: string, code: string) => rpc<StateResponse>("leery_get_state", { p_token: token, p_code: code }),
+  addBot: (token: string, code: string) => rpc<RoomView>("leery_add_bot", { p_token: token, p_code: code }),
   removePlayer: (token: string, code: string, playerId: string) =>
-    rpc<RoomView>("lh_remove_player", { p_token: token, p_code: code, p_player: playerId }),
+    rpc<RoomView>("leery_remove_player", { p_token: token, p_code: code, p_player: playerId }),
   setSpeed: (token: string, code: string, speed: Speed) =>
-    rpc<RoomView>("lh_set_speed", { p_token: token, p_code: code, p_speed: speed }),
-  start: (token: string, code: string) => rpc<RoomView>("lh_start", { p_token: token, p_code: code }),
+    rpc<RoomView>("leery_set_speed", { p_token: token, p_code: code, p_speed: speed }),
+  start: (token: string, code: string) => rpc<RoomView>("leery_start", { p_token: token, p_code: code }),
   play: (token: string, code: string, cards: CardCode[]) =>
-    rpc<RoomView>("lh_play", { p_token: token, p_code: code, p_cards: cards }),
-  call: (token: string, code: string) => rpc<RoomView>("lh_call", { p_token: token, p_code: code }),
-  pass: (token: string, code: string) => rpc<RoomView>("lh_pass", { p_token: token, p_code: code }),
-  resume: (token: string, code: string) => rpc<RoomView>("lh_resume", { p_token: token, p_code: code }),
-  rematch: (token: string, code: string) => rpc<RoomView>("lh_rematch", { p_token: token, p_code: code }),
-  leave: (token: string, code: string) => rpc<{ ok: true }>("lh_leave", { p_token: token, p_code: code }),
+    rpc<RoomView>("leery_play", { p_token: token, p_code: code, p_cards: cards }),
+  call: (token: string, code: string) => rpc<RoomView>("leery_call", { p_token: token, p_code: code }),
+  pass: (token: string, code: string) => rpc<RoomView>("leery_pass", { p_token: token, p_code: code }),
+  resume: (token: string, code: string) => rpc<RoomView>("leery_resume", { p_token: token, p_code: code }),
+  rematch: (token: string, code: string) => rpc<RoomView>("leery_rematch", { p_token: token, p_code: code }),
+  leave: (token: string, code: string) => rpc<{ ok: true }>("leery_leave", { p_token: token, p_code: code }),
 };

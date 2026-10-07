@@ -3,16 +3,16 @@
  * Lightweight local stand-in for Supabase's REST layer, for development and end-to-end tests when
  * you don't want to run the full `supabase start` stack.
  *
- * It serves exactly what the app uses — `POST /rest/v1/rpc/lh_*` — on top of a plain Postgres
+ * It serves exactly what the app uses — `POST /rest/v1/rpc/leery_*` — on top of a plain Postgres
  * (any 14+; a throwaway Docker container is fine), calling the functions as the `anon` role just
  * like PostgREST does. Realtime is not provided: run the app with VITE_REALTIME=off (polling only).
  *
- *   docker run -d --name lh-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
+ *   docker run -d --name leery-pg -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:54399:5432 postgres:16-alpine
  *   DEV_DATABASE_URL=postgres://postgres:postgres@127.0.0.1:54399/postgres npm run dev:api
  *   VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_PUBLISHABLE_KEY=dev VITE_REALTIME=off npm run dev
  *
- * The first run creates the `lh_dev` database, the anon/authenticated roles and applies the Liar's
- * Hand migrations. Set RESET=1 to drop and recreate it.
+ * The first run creates the `leery_dev` database, the anon/authenticated roles and applies the Leery
+ * migrations. Set RESET=1 to drop and recreate it.
  */
 import http from "node:http";
 import { readFileSync, readdirSync } from "node:fs";
@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 const ADMIN_URL = process.env.DEV_DATABASE_URL ?? "postgres://postgres:postgres@127.0.0.1:54399/postgres";
-const DB_NAME = process.env.DEV_DB_NAME ?? "lh_dev";
+const DB_NAME = process.env.DEV_DB_NAME ?? "leery_dev";
 const PORT = Number(process.env.PORT ?? 54321);
 const MIGRATIONS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../supabase/migrations");
 
@@ -43,7 +43,7 @@ async function ensureDatabase() {
   await db.connect();
   const has = (await db.query("select 1 from pg_namespace where nspname = 'game'")).rowCount > 0;
   if (!has) {
-    for (const f of readdirSync(MIGRATIONS).filter((f) => f.includes("liars_hand") && f.endsWith(".sql")).sort()) {
+    for (const f of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort()) {
       await db.query(readFileSync(path.join(MIGRATIONS, f), "utf8"));
       console.log(`applied ${f}`);
     }
@@ -56,7 +56,7 @@ const dbUrl = await ensureDatabase();
 // Every connection runs as `anon`, the role PostgREST uses for unauthenticated requests.
 const pool = new pg.Pool({ connectionString: dbUrl, max: 10, options: "-c role=anon" });
 
-/** name -> [{ name, type }] for the lh_* functions, read once from the catalog. */
+/** name -> [{ name, type }] for the leery_* functions, read once from the catalog. */
 const signatures = new Map();
 {
   const { rows } = await new pg.Pool({ connectionString: dbUrl, max: 1 }).query(`
@@ -64,7 +64,7 @@ const signatures = new Map();
            p.proargnames as names,
            (select array_agg(format_type(t, null) order by ord) from unnest(p.proargtypes) with ordinality u(t, ord)) as types
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public' and p.proname like 'lh\\_%'`);
+    where n.nspname = 'public' and p.proname like 'leery\\_%'`);
   for (const r of rows) signatures.set(r.proname, r.names.map((name, i) => ({ name, type: r.types[i] })));
 }
 

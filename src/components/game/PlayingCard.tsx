@@ -10,6 +10,7 @@ import { Crown } from "lucide-react";
 import { cardLabel, isRedSuit, rankOf, suitOf } from "@/lib/game";
 import type { CardCode, Rank, Suit } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { LogoMark } from "@/components/shell/Logo";
 import { CARD_UNIT, PIP_LAYOUT, type CardSize } from "./cardMetrics";
 import { SuitIcon } from "./Suit";
 import "./game.css";
@@ -103,17 +104,13 @@ function CardFace({ rank, suit }: { rank: Rank; suit: Suit }) {
   );
 }
 
+/** Every face-down card carries the brand's side-eye: someone is watching. */
 function CardBack({ unit }: { unit: number }) {
   return (
     <>
       <span className="absolute inset-[0.42em] rounded-[0.38em] border border-primary/60" />
       <span className="absolute inset-0 grid place-items-center">
-        <span
-          className="grid place-items-center rounded-full border border-primary/70 bg-background/60 text-accent shadow-[0_0_0.9em_hsl(var(--accent)/0.55)]"
-          style={{ width: "2.5em", height: "2.5em" }}
-        >
-          {unit >= 5 && <SuitIcon suit="S" className="h-[1.35em] w-[1.35em]" />}
-        </span>
+        {unit >= 5 && <LogoMark tile={false} size="3.1em" className="drop-shadow-[0_0_0.45em_hsl(var(--primary)/0.85)]" />}
       </span>
     </>
   );
@@ -137,7 +134,7 @@ const PlayingCardBase = forwardRef<HTMLElement, PlayingCardProps>(function Playi
     "relative block shrink-0 rounded-[0.6em] no-select",
     "[transform:translateY(var(--lift,0px))] transition-[transform,box-shadow] duration-200 [transition-timing-function:cubic-bezier(.22,1.25,.36,1)]",
     showBack
-      ? cn("lh-card-back ring-1 ring-primary/45", tiny ? "shadow-[0_2px_5px_rgb(0_0_0/.55)]" : "shadow-[0_6px_14px_-4px_rgb(0_0_0/.75),0_0_14px_-4px_hsl(var(--primary)/.55)]")
+      ? cn("leery-card-back ring-1 ring-primary/45", tiny ? "shadow-[0_2px_5px_rgb(0_0_0/.55)]" : "shadow-[0_6px_14px_-4px_rgb(0_0_0/.75),0_0_14px_-4px_hsl(var(--primary)/.55)]")
       : cn(
           "bg-gradient-to-br from-white via-ivory to-[#e7dfca] shadow-card",
           isRedSuit(suit) ? "text-crimson" : "text-ink",

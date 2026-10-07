@@ -12,11 +12,11 @@ import {
   watch,
 } from "./helpers";
 
-test.describe("Liar's Hand (real UI ↔ real engine)", () => {
+test.describe("Leery (real UI ↔ real engine)", () => {
   test("home: validation, code normalisation, rules dialog", async ({ page }) => {
     const errors = watch(page);
     await page.goto("/");
-    await expect(page).toHaveTitle(/Liar's Hand/);
+    await expect(page).toHaveTitle(/Leery/);
 
     // name is required
     await page.getByTestId("create-room").click();

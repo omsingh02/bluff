@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Bot, Minus, Plus, RotateCcw, Users, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { CardFan } from "@/components/shell/DecorCards";
+import { LogoMark } from "@/components/shell/Logo";
 import { RulesButton } from "@/components/shell/RulesDialog";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import { Button } from "@/components/ui/button";
@@ -90,9 +91,10 @@ export function Home() {
           <motion.h1
             variants={rise}
             custom={1}
-            className="font-display text-[clamp(2.05rem,9.6vw,3.1rem)] font-black leading-[0.95] tracking-tight drop-shadow-[0_0_28px_hsl(var(--primary)/0.4)] sm:text-6xl lg:text-[5.4rem]"
+            className="flex items-center gap-[0.22em] font-display text-[clamp(2.05rem,9.6vw,3.1rem)] font-extrabold leading-[0.95] tracking-[0.015em] drop-shadow-[0_0_28px_hsl(var(--primary)/0.4)] sm:text-6xl lg:text-[5.4rem]"
           >
-            <span className="lg:block">Liar&apos;s</span> <span className="brand-gradient-text lg:block">Hand</span>
+            <LogoMark size="0.86em" />
+            <span className="brand-gradient-text">Leery</span>
           </motion.h1>
 
           <motion.p variants={rise} custom={2} className="mt-3 font-display text-[15px] font-semibold sm:mt-4 sm:text-lg">
@@ -314,7 +316,16 @@ export function Home() {
           <RulesButton />
           <SoundToggle />
         </div>
-        <p className="text-right">Built for liars &amp; the friends who call them out.</p>
+        <p className="text-right leading-relaxed">
+          © 2026{" "}
+          <a href="https://github.com/omsingh02" className="underline-offset-2 hover:text-foreground hover:underline" target="_blank" rel="noreferrer">
+            Om Singh
+          </a>{" "}
+          ·{" "}
+          <a href="https://github.com/omsingh02/leery" className="underline-offset-2 hover:text-foreground hover:underline" target="_blank" rel="noreferrer">
+            Source
+          </a>
+        </p>
       </footer>
     </main>
   );

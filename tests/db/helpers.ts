@@ -25,7 +25,7 @@ const CAST: Record<string, string> = {
 };
 
 export interface TestDb {
-  /** Call a public.lh_* function as the `anon` role (exactly what PostgREST does). */
+  /** Call a public.leery_* function as the `anon` role (exactly what PostgREST does). */
   rpc: (fn: string, args: Record<string, unknown>) => Promise<View>;
   /** Run arbitrary SQL as superuser (inspection / scenario setup). */
   sql: <T = Record<string, unknown>>(q: string, params?: unknown[]) => Promise<T[]>;
@@ -45,7 +45,7 @@ export async function createTestDb(): Promise<TestDb> {
     if not exists (select from pg_roles where rolname = 'anon') then create role anon nologin; end if;
     if not exists (select from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
   end $$`);
-  const name = `lh_test_${randomBytes(4).toString("hex")}`;
+  const name = `leery_test_${randomBytes(4).toString("hex")}`;
   await admin.query(`create database ${name}`);
 
   const url = new URL(ADMIN_URL);
@@ -55,7 +55,7 @@ export async function createTestDb(): Promise<TestDb> {
   const setup = new Client({ connectionString: dbUrl });
   await setup.connect();
   const files = readdirSync(MIGRATIONS)
-    .filter((f) => f.includes("liars_hand") && f.endsWith(".sql"))
+    .filter((f) => f.endsWith(".sql"))
     .sort();
   for (const f of files) await setup.query(readFileSync(path.join(MIGRATIONS, f), "utf8"));
   await setup.end();
@@ -138,23 +138,23 @@ export class Seat {
   call = (fn: string, extra: Record<string, unknown> = {}) =>
     this.db.rpc(fn, { p_token: this.token, p_code: this.code, ...extra });
 
-  state = () => this.call("lh_get_state");
-  play = (cards: string[]) => this.call("lh_play", { p_cards: cards });
-  callBluff = () => this.call("lh_call");
-  pass = () => this.call("lh_pass");
-  resume = () => this.call("lh_resume");
-  start = () => this.call("lh_start");
-  addBot = () => this.call("lh_add_bot");
-  setSpeed = (s: string) => this.call("lh_set_speed", { p_speed: s });
-  rematch = () => this.call("lh_rematch");
-  leave = () => this.call("lh_leave");
-  kick = (id: string) => this.call("lh_remove_player", { p_player: id });
+  state = () => this.call("leery_get_state");
+  play = (cards: string[]) => this.call("leery_play", { p_cards: cards });
+  callBluff = () => this.call("leery_call");
+  pass = () => this.call("leery_pass");
+  resume = () => this.call("leery_resume");
+  start = () => this.call("leery_start");
+  addBot = () => this.call("leery_add_bot");
+  setSpeed = (s: string) => this.call("leery_set_speed", { p_speed: s });
+  rematch = () => this.call("leery_rematch");
+  leave = () => this.call("leery_leave");
+  kick = (id: string) => this.call("leery_remove_player", { p_player: id });
   join = async (code: string) => {
     this.code = code;
-    return this.db.rpc("lh_join_room", { p_token: this.token, p_code: code, p_name: this.name });
+    return this.db.rpc("leery_join_room", { p_token: this.token, p_code: code, p_name: this.name });
   };
   create = async (opts: { speed?: string; bots?: number; start?: boolean } = {}) => {
-    const v = await this.db.rpc("lh_create_room", {
+    const v = await this.db.rpc("leery_create_room", {
       p_token: this.token,
       p_name: this.name,
       p_speed: opts.speed ?? "standard",

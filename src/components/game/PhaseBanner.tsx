@@ -115,9 +115,9 @@ export const PhaseBanner = memo(function PhaseBanner({ view, serverNow }: { view
             </>
           ) : (
             <span className="inline-flex items-center gap-[3px] text-gold" aria-label="Thinking">
-              <i className="lh-dot" />
-              <i className="lh-dot" />
-              <i className="lh-dot" />
+              <i className="leery-dot" />
+              <i className="leery-dot" />
+              <i className="leery-dot" />
             </span>
           )}
           <span aria-hidden>·</span>

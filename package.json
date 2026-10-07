@@ -1,8 +1,33 @@
 {
-  "name": "liars-hand",
+  "name": "leery",
+  "version": "1.0.0",
+  "description": "Leery — a realtime multiplayer bluffing card game. Lie, call it, clear your hand. React + Supabase.",
+  "author": {
+    "name": "Om Singh",
+    "url": "https://github.com/omsingh02"
+  },
+  "license": "MIT",
+  "homepage": "https://leery.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omsingh02/leery.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omsingh02/leery/issues"
+  },
+  "keywords": [
+    "card-game",
+    "bluffing",
+    "multiplayer",
+    "realtime",
+    "supabase",
+    "postgres",
+    "react",
+    "typescript",
+    "vite",
+    "tailwindcss"
+  ],
   "private": true,
-  "version": "2.0.0",
-  "description": "Liar's Hand — a realtime multiplayer bluffing card game (React + Supabase).",
   "type": "module",
   "engines": {
     "node": ">=20"

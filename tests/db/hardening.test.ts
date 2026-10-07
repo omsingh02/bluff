@@ -75,7 +75,7 @@ describe.skipIf(!hasDb)("engine hardening", () => {
       const c = await db.anon();
       try {
         const as = (headers: Record<string, string>) => c.query("select set_config('request.headers', $1, false)", [JSON.stringify(headers)]);
-        const create = () => c.query("select public.lh_create_room($1, 'Nat', 'standard', 0, false)", [tok()]);
+        const create = () => c.query("select public.leery_create_room($1, 'Nat', 'standard', 0, false)", [tok()]);
 
         await as({ "cf-connecting-ip": "203.0.113.7" });
         for (let i = 0; i < 120; i++) await create();
@@ -96,8 +96,8 @@ describe.skipIf(!hasDb)("engine hardening", () => {
       const [{ n }] = await db.sql<{ n: number }>("select count(*)::int as n from game.rooms");
       const c = await db.anon();
       try {
-        await c.query("select set_config('lh.room_cap', $1, false)", [String(n + 1)]);
-        const create = () => c.query("select public.lh_create_room($1, 'Cap', 'standard', 0, false)", [tok()]);
+        await c.query("select set_config('leery.room_cap', $1, false)", [String(n + 1)]);
+        const create = () => c.query("select public.leery_create_room($1, 'Cap', 'standard', 0, false)", [tok()]);
         await create(); // takes the last slot
         await expect(create()).rejects.toThrow("too_many_rooms"); // everything is fresh: nothing to retire
         await db.sql("update game.rooms set last_active = now() - interval '2 hours' where status = 'lobby'");
@@ -257,7 +257,7 @@ describe.skipIf(!hasDb)("engine hardening", () => {
       const { code } = await sc.table(1);
       const t0 = Date.now();
       await expectError(new Seat(db, "x".repeat(2_000_000)).join(code), "name_invalid");
-      await expectError(db.rpc("lh_get_state", { p_token: tok(), p_code: "A".repeat(2_000_000) }), "room_not_found");
+      await expectError(db.rpc("leery_get_state", { p_token: tok(), p_code: "A".repeat(2_000_000) }), "room_not_found");
       expect(Date.now() - t0).toBeLessThan(1500);
     });
 
@@ -306,8 +306,8 @@ describe.skipIf(!hasDb)("engine hardening", () => {
     it("a misconfigured setting surfaces as a generic server_error", async () => {
       const c = await db.anon();
       try {
-        await c.query("select set_config('lh.room_cap', 'abc', false)");
-        await expect(c.query("select public.lh_create_room($1, 'X', 'standard', 0, false)", [tok()])).rejects.toThrow(/^server_error$/);
+        await c.query("select set_config('leery.room_cap', 'abc', false)");
+        await expect(c.query("select public.leery_create_room($1, 'X', 'standard', 0, false)", [tok()])).rejects.toThrow(/^server_error$/);
       } finally {
         await c.end();
       }
@@ -330,7 +330,7 @@ describe.skipIf(!hasDb)("engine hardening", () => {
          where s.nspname in ('game', 'public') and has_function_privilege('anon', p.oid, 'EXECUTE') order by 1`,
       );
       expect(exec.map((r) => r.n)).toEqual(
-        ["lh_add_bot", "lh_call", "lh_create_room", "lh_get_state", "lh_join_room", "lh_leave", "lh_pass", "lh_play", "lh_rematch", "lh_remove_player", "lh_resume", "lh_set_speed", "lh_start"],
+        ["leery_add_bot", "leery_call", "leery_create_room", "leery_get_state", "leery_join_room", "leery_leave", "leery_pass", "leery_play", "leery_rematch", "leery_remove_player", "leery_resume", "leery_set_speed", "leery_start"],
       );
       const [{ usage }] = await db.sql<{ usage: boolean }>("select has_schema_privilege('anon', 'game', 'USAGE') as usage");
       expect(usage).toBe(false);

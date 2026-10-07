@@ -30,7 +30,7 @@ const POLL_HIDDEN = 6000;
 /**
  * Keeps one room in sync with the server. Framework-agnostic: React reads it through `useRoom`.
  *
- * - `lh_get_state` is the heartbeat AND the clock: the server lazily advances bots/timers whenever
+ * - `leery_get_state` is the heartbeat AND the clock: the server lazily advances bots/timers whenever
  *   anyone polls, so polling is scheduled right at `view.due` (plus jitter) for snappy transitions.
  * - Realtime broadcast "pings" tell the other clients to refetch right after a change; if the
  *   websocket is blocked or unauthorised we silently fall back to faster polling.
@@ -112,7 +112,7 @@ export class RoomSync {
       return;
     }
     try {
-      const ch = supabase.channel(`lh:${this.code}`, { config: { broadcast: { self: false, ack: false } } });
+      const ch = supabase.channel(`leery:${this.code}`, { config: { broadcast: { self: false, ack: false } } });
       // The channel is public (anyone who knows the code may broadcast), so never let pings drive more than
       // ~2 refreshes per second: leading edge immediately, then at most one trailing refresh per window.
       ch.on("broadcast", { event: "ping" }, () => this.onPing());

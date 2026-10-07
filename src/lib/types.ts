@@ -1,5 +1,5 @@
 /**
- * Wire contract between the Postgres game engine (supabase/migrations/*_liars_hand_engine.sql,
+ * Wire contract between the Postgres game engine (supabase/migrations/*_engine.sql,
  * see `game.view()`) and the UI.
  *
  * The server is authoritative: the client never computes game state, it only renders what it is
