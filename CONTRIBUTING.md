@@ -36,5 +36,6 @@ test in `tests/db/`.
 - Keep it simple and readable; match the surrounding style (TypeScript strict, ESLint clean).
 - Don't commit secrets or `.env*` files.
 - One logical change per pull request, with a short description of *why*.
+- Be kind: this project follows a [Code of Conduct](CODE_OF_CONDUCT.md).
 
 By contributing you agree that your contribution is licensed under the project's [MIT license](LICENSE).
