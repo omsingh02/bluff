@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://leery.vercel.app"><strong>▶ Play now</strong></a> &nbsp;·&nbsp;
+  <a href="https://leery.omsingh.me"><strong>▶ Play now</strong></a> &nbsp;·&nbsp;
   <a href="#how-to-play">How to play</a> &nbsp;·&nbsp;
   <a href="#run-it-yourself">Run it yourself</a> &nbsp;·&nbsp;
   <a href="#how-it-works">How it works</a>
@@ -17,7 +17,7 @@
 <p align="center">
   <a href="https://github.com/omsingh02/leery/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/omsingh02/leery/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-8b5cf6"></a>
-  <a href="https://leery.vercel.app"><img alt="Play online" src="https://img.shields.io/badge/play-leery.vercel.app-ec4899"></a>
+  <a href="https://leery.omsingh.me"><img alt="Play online" src="https://img.shields.io/badge/play-leery.omsingh.me-ec4899"></a>
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178c6">
   <img alt="Rules run in Postgres" src="https://img.shields.io/badge/rules-run%20in%20Postgres-336791">
 </p>
